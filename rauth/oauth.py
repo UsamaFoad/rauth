@@ -208,7 +208,8 @@ class RsaSha1Signature(SignatureMethod):
         # resolve the key
         if is_basestring(consumer_secret):
             consumer_secret = self.RSA.importKey(consumer_secret)
-        if not isinstance(consumer_secret, self.RSA._RSAobj):
+        # Check for RSA key attribute instead
+        if not hasattr(consumer_secret, 'n'):
             raise ValueError('invalid consumer_secret')
 
         # hash the string with RSA-SHA1

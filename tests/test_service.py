@@ -16,6 +16,14 @@ import pickle
 
 
 class MutableDatetime(datetime):
+    # Add the UTC timezone attribute for Python 3.13 compatibility
+    UTC = datetime.timezone.utc if hasattr(datetime, 'timezone') else None
+
+    @classmethod
+    def now(cls, tz=None):
+        # Return the same fixed datetime that utcnow() returns
+        return datetime(1900, 1, 1)
+
     def __new__(cls, *args, **kwargs):
         return datetime.__new__(datetime, *args, **kwargs)
 

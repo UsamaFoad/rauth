@@ -202,8 +202,8 @@ class OAuth1Service(Service):
         :param method: A string representation of the HTTP method to be used,
             defaults to `GET`.
         :type method: str
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         # ensure we've set the request_token_url
         if self.request_token_url is None:
@@ -236,8 +236,8 @@ class OAuth1Service(Service):
         :param key_token_secret: The key the access token will be decoded by,
             defaults to 'oauth_token_secret'.
         :type string:
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         r = self.get_raw_request_token(method=method, **kwargs)
         request_token, request_token_secret = \
@@ -251,9 +251,9 @@ class OAuth1Service(Service):
         :param request_token: The request token as returned by
             :class:`get_request_token`.
         :type request_token: str
-        :param \*\*params: Additional keyworded arguments to be added to the
+        :param **params: Additional keyworded arguments to be added to the
             request querystring.
-        :type \*\*params: dict
+        :type **params: dict
         '''
         params.update({'oauth_token': request_token})
         return self.authorize_url + '?' + urlencode(params)
@@ -278,8 +278,8 @@ class OAuth1Service(Service):
         :param method: A string representation of the HTTP method to be
             used, defaults to `GET`.
         :type method: str
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         # ensure we've set the access_token_url
         if self.access_token_url is None:
@@ -320,8 +320,8 @@ class OAuth1Service(Service):
         :param key_token_secret: The key the access token will be decoded by,
             defaults to 'oauth_token_secret'.
         :type string:
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         r = self.get_raw_access_token(request_token,
                                       request_token_secret,
@@ -350,8 +350,8 @@ class OAuth1Service(Service):
         :param method: A string representation of the HTTP method to be
             used, defaults to `GET`.
         :type method: str
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         token = self.get_access_token(request_token,
                                       request_token_secret,
@@ -483,9 +483,9 @@ class OAuth2Service(Service):
         '''
         Returns a formatted authorize URL.
 
-        :param \*\*params: Additional keyworded arguments to be added to the
+        :param **params: Additional keyworded arguments to be added to the
             URL querystring.
-        :type \*\*params: dict
+        :type **params: dict
         '''
 
         params.update({'client_id': self.client_id})
@@ -501,8 +501,8 @@ class OAuth2Service(Service):
         :param method: A string representation of the HTTP method to be used,
             defaults to `POST`.
         :type method: str
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         key = 'params'
         if method in ENTITY_METHODS:
@@ -535,8 +535,8 @@ class OAuth2Service(Service):
         :param key: The key the access token will be decoded by, defaults to
             'access_token'.
         :type string:
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         r = self.get_raw_access_token(method, **kwargs)
         access_token, = process_token_request(r, decoder, key)
@@ -550,8 +550,8 @@ class OAuth2Service(Service):
         :param method: A string representation of the HTTP method to be used,
             defaults to `POST`.
         :type method: str
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         session = self.get_session(self.get_access_token(method, **kwargs))
 
@@ -651,9 +651,9 @@ class OflyService(Service):
         '''
         Returns a formatted authorize URL.
 
-        :param \*\*params: Additional keyworded arguments to be added to the
+        :param **params: Additional keyworded arguments to be added to the
             request querystring.
-        :type \*\*params: dict
+        :type **params: dict
         '''
         params = self.session_obj.sign(self.authorize_url,
                                        self.app_id,
@@ -668,7 +668,7 @@ class OflyService(Service):
 
         :param user_id: The oflyUserid, defaults to `None`.
         :type user_id: str
-        :param \*\*kwargs: Optional arguments. Same as Requests.
-        :type \*\*kwargs: dict
+        :param **kwargs: Optional arguments. Same as Requests.
+        :type **kwargs: dict
         '''
         return self.get_session(user_id)

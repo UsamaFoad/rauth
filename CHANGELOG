@@ -3,6 +3,18 @@ Rauth Changelog
 
 This provides a list of changes to rauth by release.
 
+Changes in Version 0.7.4
+------------------------
+  * Fixed invalid escape sequence warnings in docstrings (Python 3.13 compatibility)
+  * Migrated test suite from nose/yanc to pytest
+  * Updated RSA key validation to use hasattr instead of isinstance
+  * Fixed timezone handling using datetime.now(timezone.utc)
+  * Fixed bytes data handling in OAuth1Session.request()
+  * Dropped support for Python 2.6, 2.7, 3.3, 3.4
+  * Added support for Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
+  * Updated development dependencies (pytest, pytest-cov, pytest-sugar, pycryptodome)
+  * Removed deprecated Travis CI (.travis.yml) and migrate to GitHub Actions (.github/workflows/test.yml)  
+
 Changes in Version 0.7.3
 ------------------------
   * Moved canonical fork to maxcountryman/rauth

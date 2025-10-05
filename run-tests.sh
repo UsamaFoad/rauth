@@ -7,48 +7,49 @@ log()
     echo "$@" | tee -a $OUTPUT_PATH/test.log
 }
 
-nosetest_yanc_plugin()
+pytest_cov_plugin()
 {
-    nosetests --plugins | grep yanc >/dev/null
+    python -c "import pytest_cov" 2>/dev/null
+}
+
+pytest_color_support()
+{
+    python -c "import pytest" 2>/dev/null
 }
 
 rm -rf $OUTPUT_PATH
 mkdir -p $OUTPUT_PATH
 
-NOSETEST_OPTIONS="-d"
-
 if [ -n "$VERBOSE" ]; then
-    NOSETEST_OPTIONS="$NOSETEST_OPTIONS --verbose"
+    PYTEST_OPTIONS="$PYTEST_OPTIONS -v"
 fi
 
-if [ -z "$NOCOLOR" ] && nosetest_yanc_plugin; then
-    NOSETEST_OPTIONS="$NOSETEST_OPTIONS --with-yanc --yanc-color=on"
+if [ -z "$NOCOLOR" ] && pytest_color_support; then
+    PYTEST_OPTIONS="$PYTEST_OPTIONS --color=yes"
 fi
 
 if [ -n "$OPTIONS" ]; then
-    NOSETEST_OPTIONS="$NOSETEST_OPTIONS $OPTIONS"
+    PYTEST_OPTIONS="$PYTEST_OPTIONS $OPTIONS"
 fi
 
 if [ -n "$TESTS" ]; then
-    NOSETEST_OPTIONS="$NOSETEST_OPTIONS $TESTS"
+    PYTEST_OPTIONS="$PYTEST_OPTIONS $TESTS"
 else
-    NOSETEST_OPTIONS="$NOSETEST_OPTIONS --with-coverage --cover-min-percentage=100 --cover-package=rauth"
+    PYTEST_OPTIONS="$PYTEST_OPTIONS --cov=rauth --cov-report=term-missing --cov-fail-under=100"
 fi
-
-nosetest_yanc_plugin || [ -n "$NOCOLOR" ] || log "No yanc plugin for nosetests found. Color output unavailable."
 
 log "Running tests..."
 
 if [ $BASH ]; then
-    nosetests $NOSETEST_OPTIONS 2>&1 | tee -a $OUTPUT_PATH/test.log
+    pytest $PYTEST_OPTIONS 2>&1 | tee -a $OUTPUT_PATH/test.log
     R=${PIPESTATUS[0]}
 else
-    4>&1 R=$({ { nosetests $NOSETEST_OPTIONS 2>&1; echo $? >&3 ; } | { tee -a $OUTPUT_PATH/test.log >&4; } } 3>&1)
+    4>&1 R=$({ { pytest $PYTEST_OPTIONS 2>&1; echo $? >&3 ; } | { tee -a $OUTPUT_PATH/test.log >&4; } } 3>&1)
 fi
 
 echo
 
-nosetests -V
+pytest --version
 python -V
 
 case "$R" in

@@ -71,3 +71,37 @@ class UtilsTestCase(RauthTestCase):
         r = auth(Request())
         self.assertEqual(r.headers['Authorization'],
                          'Bearer ' + access_token)
+
+    def test_parse_utf8_qsl_with_bytes(self):
+        """Test parse_utf8_qsl when parse_qsl returns bytes"""
+        from unittest.mock import patch
+        from rauth.utils import parse_utf8_qsl
+
+        # Mock parse_qsl to return bytes instead of strings
+        with patch('rauth.utils.parse_qsl') as mock_parse_qsl:
+            # Simulate Python 2 behavior where parse_qsl returns bytes
+            mock_parse_qsl.return_value = [
+                (b'f\xc3\xbc', b'bar'),  # 'fü' as bytes
+                (b'rauth', b'\xc3\xbcber')  # 'über' as bytes
+            ]
+
+            d = parse_utf8_qsl('fü=bar&rauth=über')
+
+            # Should decode bytes to strings
+            self.assertEqual(d, {u'fü': u'bar', u'rauth': u'über'})
+
+    def test_parse_utf8_qsl_mixed_bytes_strings(self):
+        """Test parse_utf8_qsl with mixed bytes and strings"""
+        from unittest.mock import patch
+        from rauth.utils import parse_utf8_qsl
+
+        with patch('rauth.utils.parse_qsl') as mock_parse_qsl:
+            # Mix of bytes and strings
+            mock_parse_qsl.return_value = [
+                (b'key1', 'value1'),  # bytes key, string value
+                ('key2', b'value2'),  # string key, bytes value
+            ]
+
+            d = parse_utf8_qsl('key1=value1&key2=value2')
+
+            self.assertEqual(d, {'key1': 'value1', 'key2': 'value2'})

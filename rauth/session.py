@@ -7,7 +7,7 @@
 '''
 
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 from hashlib import sha1, md5
 from random import SystemRandom
 from time import time
@@ -140,8 +140,8 @@ class OAuth1Session(RauthSession):
         :type header_auth: bool
         :param realm: The auth header realm, defaults to ``""``.
         :type realm: str
-        :param \*\*req_kwargs: Keyworded args to be passed down to Requests.
-        :type \*\*req_kwargs: dict
+        :param **req_kwargs: Keyworded args to be passed down to Requests.
+        :type **req_kwargs: dict
         '''
         req_kwargs.setdefault('headers', {})
         req_kwargs['headers'] = CaseInsensitiveDict(req_kwargs['headers'])
@@ -183,8 +183,8 @@ class OAuth1Session(RauthSession):
         if header_auth and 'oauth_signature' not in \
                 req_kwargs['headers'].get('Authorization', ''):
             req_kwargs['auth'] = OAuth1Auth(oauth_params, realm)
-        elif entity_method and 'oauth_signature' not in \
-                (req_kwargs.get('data') or {}):
+        elif entity_method and not isinstance(req_kwargs.get('data'), bytes) \
+                and 'oauth_signature' not in (req_kwargs.get('data') or {}):
             req_kwargs['data'] = req_kwargs.get('data') or {}
 
             # If we have a urlencoded entity-body we should pass the OAuth
@@ -225,7 +225,7 @@ class OAuth1Session(RauthSession):
         for oauth_param in OPTIONAL_OAUTH_PARAMS:
             if oauth_param in params:
                 oauth_params[oauth_param] = params.pop(oauth_param)
-            if oauth_param in data:
+            if not isinstance(data, bytes) and oauth_param in data:
                 oauth_params[oauth_param] = data.pop(oauth_param)
 
             if params:
@@ -337,8 +337,8 @@ class OAuth2Session(RauthSession):
         :param bearer_auth: Whether to use Bearer Authentication or not,
             defaults to `True`.
         :type bearer_auth: bool
-        :param \*\*req_kwargs: Keyworded args to be passed down to Requests.
-        :type \*\*req_kwargs: dict
+        :param **req_kwargs: Keyworded args to be passed down to Requests.
+        :type **req_kwargs: dict
         '''
         req_kwargs.setdefault('params', {})
 
@@ -435,8 +435,8 @@ class OflySession(RauthSession):
         :type hash_meth: str
         :param user_id: The oflyUserid, defaults to `None`.
         :type user_id: str
-        :param \*\*req_kwargs: Keyworded args to be passed down to Requests.
-        :type \*\*req_kwargs: dict
+        :param **req_kwargs: Keyworded args to be passed down to Requests.
+        :type **req_kwargs: dict
         '''
         req_kwargs.setdefault('params', {})
         req_kwargs.setdefault('timeout', OFLY_DEFAULT_TIMEOUT)
@@ -478,8 +478,8 @@ class OflySession(RauthSession):
         :param hash_meth: The hash method to use for signing, defaults to
             "sha1".
         :type hash_meth: str
-        :param \*\*params: Additional parameters.
-        :type \*\*\params: dict
+        :param **params: Additional parameters.
+        :type **params: dict
         '''
         hash_meth_str = hash_meth
         if hash_meth == 'sha1':
@@ -489,7 +489,7 @@ class OflySession(RauthSession):
         else:
             raise TypeError('hash_meth must be one of "sha1", "md5"')
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         milliseconds = now.microsecond // 1000
 
         time_format = '%Y-%m-%dT%H:%M:%S.{0}Z'.format(milliseconds)

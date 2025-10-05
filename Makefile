@@ -1,4 +1,4 @@
-.PHONY: all test clean_coverage clean pep8 pyflakes check 
+.PHONY: all test clean_coverage clean flake8 check
 
 all:
 	@echo 'test           run the unit tests'
